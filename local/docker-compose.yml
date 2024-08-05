@@ -1,0 +1,238 @@
+# This file is used for development puprose
+# It only create the clab to work locally
+# It is not supposed to be deployed
+
+services:
+  
+  # Environment to code in remote container in linux
+  dev-env:
+    image: local-dev-env
+    environment:
+      - LAB_NAME=MyLab
+      - LAB_TOKEN=123456
+      - LAB_DB_ENGINE=mariadb
+      - LAB_MODE=dev
+      - LAB_ENVIRONMENT=LOCAL
+      - LAB_PROD_API_URL=http://localhost:3000
+      - LAB_DEV_API_URL=http://localhost:3000
+      - CENTRAL_API_KEY=123456
+      - CENTRAL_API_URL=http://host.docker.internal:3001
+      - FRONT_URL=http://localhost:4200
+      - FRONT_VERSION=1.0.0
+      - VIRTUAL_HOST=
+      - BIOTA_BIODATA_DIR=/data/gws_biota/biodata/
+      - CONDA_VERSION=latest
+      - GPU=
+      # COMMUNITY
+      - COMMUNITY_API_URL=https://api.constellab.community
+      - COMMUNITY_FRONT_URL=https://constellab.community
+      - COMMUNITY_API_KEY=
+      # GWS_CORE database
+      - GWS_CORE_DB_HOST=gws_core_dev_db
+      - GWS_CORE_DB_USER=gws_core
+      - GWS_CORE_DB_PASSWORD=gencovery
+      - GWS_CORE_DB_NAME=gws_core
+      - GWS_CORE_DB_PORT=3306
+      # Test database
+      - GWS_TEST_DB_HOST=test_gws_dev_db
+      - GWS_TEST_DB_USER=test_gws
+      - GWS_TEST_DB_PASSWORD=gencovery
+      - GWS_TEST_DB_NAME=test_gws
+      - GWS_TEST_DB_PORT=3306
+      # GWS_BIOTA database
+      - GWS_BIOTA_DB_HOST=gws_biota_db
+      - GWS_BIOTA_DB_USER=gws_biota
+      - GWS_BIOTA_DB_PASSWORD=gencovery
+      - GWS_BIOTA_DB_NAME=gws_biota
+      - GWS_BIOTA_DB_PORT=3306
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    # Set your own path on the volume  
+    volumes:
+      # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
+      # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
+      - lab-app:/lab
+      - lab-data:/data
+      - lab-logs:/logs
+      - [PATH_TO_CONFIG]/config.json:/conf/config.json
+    networks:
+       - gencovery-network
+    ports: 
+       - 3000:3000
+       - 8080:8080
+
+  # Run the codelab in local with same volume as dev-env
+  # The local-codelab image must be built before from GPM package
+  # local-codelab:
+  #   image: local-codelab
+  #   environment:
+  #     # COMMUNITY
+  #     - COMMUNITY_API_URL=https://api.constellab.community
+  #     - COMMUNITY_FRONT_URL=https://constellab.community
+  #     - COMMUNITY_API_KEY=
+  #   ports: 
+  #      - 8081:8080
+  #   volumes:
+  #     # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
+  #     # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
+  #     - lab-app:/lab
+  #     - lab-data:/data
+  #     - lab-logs:/logs
+      # - [PATH_TO_CONFIG]/config.json:/conf/config.json
+
+     
+
+  # Lab manager
+  lab-manager:
+    image: local-lab-manager
+    environment:
+      - VOLUME_PATH=/app/conf
+      - VIRTUAL_HOST=localhost
+      - LAB_MANAGER_CONFIG_VOL=lab-manager-config
+      - LAB_MANAGER_BIOTA_DB_VOL=lab-manager-biota
+      - LAB_MANAGER_PROD_LAB_VOL=lab-manager-prod-lab
+      - LAB_MANAGER_DEV_LAB_VOL=lab-manager-dev-lab
+    volumes:
+      # map the named volume to the same path as prod environment
+      - lab-manager-config:/app/conf
+      - lab-manager-prod-db:/app/gws_db/gws_core/prod/mariadb
+      - lab-manager-dev-db:/app/gws_db/gws_core/dev/mariadb
+      - lab-manager-biota:/app/gws_db/gws_biota/mariadb
+      - lab-manager-prod-lab:/app/prod/lab
+      - lab-manager-dev-lab:/app/dev/lab
+      # Volume on home to save the code
+      - lab-manager-home:/home
+      # share docker socket
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+       - gencovery-network
+    ports: 
+       - 3080:3080
+
+
+  # Service to test glab locally
+  # It does not uses the same volume as dev-env
+  # # It uses the same config file and database as dev-env
+  # local-glab:
+  #   image: glab:latest
+  #   environment:
+  #     - LAB_NAME=MyLab
+  #     - LAB_TOKEN=123456
+  #     - LAB_DB_ENGINE=mariadb
+  #     - LAB_MODE=dev
+  #     - LAB_ENVIRONMENT=LOCAL
+  #     - LAB_PROD_API_URL=
+  #     - LAB_DEV_API_URL=
+  #     - CENTRAL_API_KEY=
+  #     - CENTRAL_API_URL=
+  #     - FRONT_URL=
+  #     - FRONT_VERSION=
+  #     - VIRTUAL_HOST=
+  #     - BIOTA_BIODATA_DIR=/data/gws_biota/biodata/
+  #     - CONDA_VERSION=latest
+  #     - GPU=
+  #     # COMMUNITY
+  #     - COMMUNITY_API_URL=https://api.constellab.community
+  #     - COMMUNITY_FRONT_URL=https://constellab.community
+  #     - COMMUNITY_API_KEY=
+  #     # GWS_CORE database
+  #     - GWS_CORE_DB_HOST=gws_core_dev_db
+  #     - GWS_CORE_DB_USER=gws_core
+  #     - GWS_CORE_DB_PASSWORD=gencovery
+  #     - GWS_CORE_DB_NAME=gws_core
+  #     - GWS_CORE_DB_PORT=3306
+  #     # GWS_BIOTA database
+  #     - GWS_BIOTA_DB_HOST=gws_biota_db
+  #     - GWS_BIOTA_DB_USER=gws_biota
+  #     - GWS_BIOTA_DB_PASSWORD=gencovery
+  #     - GWS_BIOTA_DB_NAME=gws_biota
+  #     - GWS_BIOTA_DB_PORT=3306
+  #   depends_on:
+  #     - gws_core_dev_db
+  #     # - gws_biota_dev_db
+  #   # Set your own path on the volume  
+  #   volumes:
+  #     # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
+  #     # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
+  #     - glab-app:/lab
+  #     - glab-data:/data
+  #     - glab-logs:/logs
+  #     - glab-settings:/conf/settings
+      # - [PATH_TO_CONFIG]/config.json:/conf/config.json
+  #   networks:
+  #      - gencovery-network
+  #   ports: 
+  #      - 3000:3000
+  #      - 8080:8080
+  
+
+  # GWS Development DB
+  gws_core_dev_db:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gws_core
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=gws_core
+    ports:
+      - 3307:3306
+    networks:
+       - gencovery-network
+  
+  # Biota Development DB
+  gws_biota_db:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gws_biota
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=gws_biota
+    ports:
+      - 3309:3306
+    volumes:
+      - biota:/var/lib/mysql
+    networks:
+       - gencovery-network
+
+  # GWS Test db
+  test_gws_dev_db:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=test_gws
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=test_gws
+    ports:
+      - 3308:3306
+    networks:
+       - gencovery-network
+
+volumes:
+  lab:
+  lab-app:
+  lab-data:
+  lab-logs:
+  lab-settings:
+  # Thoses volumes are used by lab-manager when running locally
+  # They are used to create volume between the lab manager container and the containers created by the lab manager
+  lab-manager-home:
+  lab-manager-config:
+    external: true
+  lab-manager-prod-db:
+    external: true
+  lab-manager-dev-db:
+    external: true
+  lab-manager-biota:
+    external: true
+  lab-manager-prod-lab:
+    external: true
+  lab-manager-dev-lab:
+    external: true
+  glab-app:
+  glab-data:
+  glab-logs:
+  glab-settings:
+  biota:
+
+networks:
+  gencovery-network:
+    external: false

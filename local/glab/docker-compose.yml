@@ -1,0 +1,79 @@
+# This file is used for development puprose
+# It create a glab container that run with a config similar to the one used in production
+# TO run this file, in the local folder execute : 
+# docker-compose -f .\glab\docker-compose.yml --env-file ./.env up -d local-glab
+version: "3"
+
+services:
+  
+  local-glab:
+    image: glab:latest
+    environment:
+      - LAB_NAME=MyLab
+      - LAB_TOKEN=123456
+      - LAB_DB_ENGINE=mariadb
+      - LAB_MODE=dev
+      - LAB_ENVIRONMENT=LOCAL
+      - LAB_PROD_API_URL=
+      - LAB_DEV_API_URL=
+      - CENTRAL_API_KEY=
+      - CENTRAL_API_URL=
+      - FRONT_URL=
+      - FRONT_VERSION=
+      - VIRTUAL_HOST=
+      - BIOTA_BIODATA_DIR=/data/gws_biota/biodata/
+      - CONDA_VERSION=latest
+      - GPU=
+      # COMMUNITY
+      - COMMUNITY_API_URL=https://api.constellab.community
+      - COMMUNITY_FRONT_URL=https://constellab.community
+      - COMMUNITY_API_KEY=
+      # GWS_CORE database
+      - GWS_CORE_DB_HOST=gws_core_dev_db_glab
+      - GWS_CORE_DB_USER=gws_core
+      - GWS_CORE_DB_PASSWORD=gencovery
+      - GWS_CORE_DB_NAME=gws_core
+      - GWS_CORE_DB_PORT=3306
+    depends_on:
+      - gws_core_dev_db_glab
+      # - gws_biota_dev_db
+    # Set your own path on the volume  
+    volumes:
+      # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
+      # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
+      - glab-app:/lab
+      - glab-data:/data
+      - glab-logs:/logs
+      - glab-settings:/conf/settings
+      # - [PATH TO CONFIG JSON]\\config.json:/conf/config.json
+    networks:
+       - gencovery-network-glab
+    ports: 
+       - 3000:3000
+       - 8080:8080
+    
+
+  
+
+  # GWS Development DB
+  gws_core_dev_db_glab:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gws_core
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=gws_core
+    ports:
+      - 3317:3306
+    networks:
+       - gencovery-network-glab
+  
+volumes:
+  glab-app:
+  glab-data:
+  glab-logs:
+  glab-settings:
+
+networks:
+  gencovery-network-glab:
+    external: false

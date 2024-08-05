@@ -1,0 +1,76 @@
+# Docker-compose file for on premise lab that have a local certificate to use
+
+services:
+
+  # Production Glab
+  lab_manager:
+    image: constellab/${LAB_MANAGER_VERSION}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /app:/app
+    environment:
+      - VOLUME_PATH=/app/conf
+      - LOG_PATH=/app/lab_manager/logs
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LAB_MANAGER_API_KEY=${LAB_MANAGER_API_KEY}
+      - ENVIRONMENT_PROFILE=${ENVIRONMENT_PROFILE} # pre-prod or prod
+    labels:
+      - "traefik.enable=true"
+      # Config for the HTTPS glab domain to port 3080
+      - "traefik.http.routers.lab-manager-router.rule=host(`lab-manager.${VIRTUAL_HOST}`)"
+      # If there is multiple domain (like a public and a private, it can be configure like this)
+      # - "traefik.http.routers.lab-manager-router.rule=host(`lab-manager.${VIRTUAL_HOST}`) || host(`lab-manager2.${VIRTUAL_HOST}`)"
+      - "traefik.http.routers.lab-manager-router.service=lab-manager-service"
+      - "traefik.http.services.lab-manager-service.loadbalancer.server.port=3080"
+      # Enable HTTPS
+      - "traefik.http.routers.lab-manager-router.entrypoints=websecure"
+      - "traefik.http.routers.lab-manager-router.tls.certresolver=myresolver"
+    networks:
+      - gencovery-network-manager
+    restart: always
+    container_name: lab_manager
+
+  # Traefik reverse proxy
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.11.0
+    command:
+      # So that Traefik can listen to the Docker events
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # Enable HTTPS
+      - "--entrypoints.websecure.address=:443"
+      # set the traefik config to use local certificates
+      # exemple of this file is in the repo
+      - "--providers.file.filename=/home/traefik.yml"
+      # Json file to store certificate
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+      # Redirect HTTP to HTTPS
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      # Volume to store the lets encrypt certificats
+      - /srv/letsencrypt:/letsencrypt
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/home/traefik.yml
+    networks:
+      - gencovery-network-manager
+      - gencovery-network-dev
+      - gencovery-network-prod
+    restart: always
+    container_name: reverse_proxy
+
+networks:
+  gencovery-network-manager:
+    external: true
+  gencovery-network-dev:
+    external: true
+  gencovery-network-prod:
+    external: true

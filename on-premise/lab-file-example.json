@@ -1,0 +1,20 @@
+{
+  "space": {
+    "apiUrl": "https://api.constellab.space",
+    "apiKey": "",
+    "frontUrl": "YOUR SPACE URL"
+  },
+  "community": {
+    "apiUrl": "https://api.constellab.community",
+    "apiKey": "",
+    "frontUrl": "https://constellab.community"
+  },
+  "codelabToken": "",
+  "gwsCoreProdPassword": "",
+  "gwsCoreDevPassword": "",
+  "labConfig": {
+    "enableBackup": false
+  },
+  "captchaSiteKey": "",
+  "openaiApiKey": ""
+}
