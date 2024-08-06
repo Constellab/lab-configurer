@@ -129,3 +129,11 @@ Now the lab manager is ready and can be configured. If constellab server can acc
      3. Check the logs of the lab manager : ```docker logs lab-manager -f```. The lab should be starting, it can take some time. Once ready check the logs of the glab container to see if the lab is correctly started : ```docker logs glab -f```.
 3. Test the lab connection by using your browser and connecting to the ```https://lab.${VIRTUAL_HOST}``` url. You should see the lab interface. Login with your constellab credentials.
      1. If the login doesn't work, check that you've added your user to the lab in the constellab. Once added you will need to restart the lab by calling the init-all endpoint again. You can check the glab logs to see if the user is correctly added with the message (after the start) : ```1 synchronized users from space```.
+
+<br/>
+
+This repository is maintained with ❤️ by [Gencovery](https://gencovery.com/).
+
+<p align="center">
+  <img src="https://framerusercontent.com/images/Z4C5QHyqu5dmwnH32UEV2DoAEEo.png?scale-down-to=512" alt="Gencovery Logo"  width="30%">
+</p>
