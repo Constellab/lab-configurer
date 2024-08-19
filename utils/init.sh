@@ -1,9 +1,17 @@
 #!/bin/bash
 
 # Create the required networks
-docker network create -d bridge gencovery-network-manager
-docker network create -d bridge gencovery-network-dev
-docker network create -d bridge gencovery-network-prod
+if [[ "$(docker network ls | grep "gencovery-network-manager")" == "" ]] ; then
+  docker network create -d bridge gencovery-network-manager
+fi
+
+if [[ "$(docker network ls | grep "gencovery-network-dev")" == "" ]] ; then
+  docker network create -d bridge gencovery-network-dev
+fi
+
+if [[ "$(docker network ls | grep "gencovery-network-dev")" == "" ]] ; then
+  docker network create -d bridge gencovery-network-prod
+fi
 
 # Initialize variables
 VIRTUAL_HOST=""
