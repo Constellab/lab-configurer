@@ -9,7 +9,7 @@ if [[ "$(docker network ls | grep "gencovery-network-dev")" == "" ]] ; then
   docker network create -d bridge gencovery-network-dev
 fi
 
-if [[ "$(docker network ls | grep "gencovery-network-dev")" == "" ]] ; then
+if [[ "$(docker network ls | grep "gencovery-network-prod")" == "" ]] ; then
   docker network create -d bridge gencovery-network-prod
 fi
 
