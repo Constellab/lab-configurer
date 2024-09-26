@@ -68,3 +68,22 @@ export LAB_MANAGER_API_KEY=$LAB_MANAGER_API_KEY
 sudo sed -i "/LAB_MANAGER_VERSION/d" /etc/environment
 sudo sh -c "echo LAB_MANAGER_VERSION=$LAB_MANAGER_VERSION >> /etc/environment"
 export LAB_MANAGER_VERSION=$LAB_MANAGER_VERSION
+
+
+# Enable firewall using ufw
+# Check UFW status
+ufw_status=$(sudo ufw status | grep -o "Status: active")
+
+# If UFW is active
+if [ "$ufw_status" == "Status: active" ]; then
+    echo "UFW is enabled, skipping..."
+else
+    echo "UFW is disabled, enabling..."
+    # allow OpenSSH, HTTP, and HTTPS incoming traffic only
+    sudo ufw default deny incoming
+    sudo ufw default allow outgoing
+    sudo ufw allow OpenSSH
+    sudo ufw allow 80
+    sudo ufw allow 443
+    sudo ufw --force enable
+fi
