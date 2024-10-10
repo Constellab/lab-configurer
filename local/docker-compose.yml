@@ -1,8 +1,59 @@
+
+
 # This file is used for development puprose
 # It only create the clab to work locally
 # It is not supposed to be deployed
-
+name: dev-env
 services:
+
+  central:
+    image: mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencoveryDb
+      - MYSQL_USER=gencoveryUser
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=gencoveryDb
+    ports:
+      - 3306:3306
+    container_name: central-db
+    volumes:
+      - central-db:/var/lib/mysql
+
+  hub:
+    image: mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencoveryDb
+      - MYSQL_USER=gencoveryUser
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=hubDb
+    ports:
+      - 3310:3306
+    container_name: hub-db
+    volumes:
+      - hub-db:/var/lib/mysql
+
+  rabbitmq:
+    image: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    ports:
+      - 5672:5672
+    container_name: rabbitmq
+
+  mail-slurper:
+    image: marcopas/docker-mailslurper
+    ports:
+      - "2500:2500"
+      - "8081:8080"
+      - "8085:8085"
+    container_name: mail-slurper
+
+  adminer:
+    image: adminer
+    ports:
+      - 8082:8080
+
   
   # Environment to code in remote container in linux
   dev-env:
@@ -50,15 +101,83 @@ services:
     volumes:
       # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
-      - lab-app:/lab
-      - lab-data:/data
-      - lab-logs:/logs
-      - [PATH_TO_CONFIG]/config.json:/conf/config.json
-    networks:
-       - gencovery-network
+      - dev-env-app:/lab
+      - dev-env-data:/data
+      - dev-env-logs:/logs
+      - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
+      # Share git credentials by sharing ssh private key
+      - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
     ports: 
        - 3000:3000
        - 8080:8080
+
+    container_name: lab-dev-env
+
+
+  # Lab manager
+  lab-manager-dev-env:
+    image: local-lab-manager
+    environment:
+      - VOLUME_PATH=/app/conf
+      - VIRTUAL_HOST=localhost
+    volumes:
+      # map the named volume to the same path as prod environment
+      - lab-manager-config:/app/conf
+      - lab-manager-prod-db:/app/gws_db/gws_core/prod/mariadb
+      - lab-manager-dev-db:/app/gws_db/gws_core/dev/mariadb
+      - lab-manager-biota:/app/gws_db/gws_biota/mariadb
+      - lab-manager-prod-lab:/app/prod/lab
+      - lab-manager-prod-data:/app/prod/data
+      - lab-manager-dev-lab:/app/dev/lab
+      # Volume on home to save the code
+      - lab-manager-home:/home
+      # share docker socket
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Share git credentials by sharing ssh private key
+      - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
+    ports: 
+       - 3080:3080
+    container_name: lab-manager-dev-env
+  
+  # GWS Development DB
+  lab-db:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gws_core
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=gws_core
+    ports:
+      - 3307:3306
+    container_name: lab-db
+    volumes:
+      - lab-db:/var/lib/mysql
+  
+  # Biota Development DB
+  lab-biota-db:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gws_biota
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=gws_biota
+    ports:
+      - 3309:3306
+    volumes:
+      - biota:/var/lib/mysql
+    container_name: lab-biota-db
+
+  # GWS Test db
+  lab-test-db:
+    image: mariadb:10.7.4
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=test_gws
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=test_gws
+    ports:
+      - 3308:3306
+    container_name: lab-test-db
 
   # Run the codelab in local with same volume as dev-env
   # The local-codelab image must be built before from GPM package
@@ -77,37 +196,8 @@ services:
   #     - lab-app:/lab
   #     - lab-data:/data
   #     - lab-logs:/logs
-      # - [PATH_TO_CONFIG]/config.json:/conf/config.json
-
+  #     - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
      
-
-  # Lab manager
-  lab-manager:
-    image: local-lab-manager
-    environment:
-      - VOLUME_PATH=/app/conf
-      - VIRTUAL_HOST=localhost
-      - LAB_MANAGER_CONFIG_VOL=lab-manager-config
-      - LAB_MANAGER_BIOTA_DB_VOL=lab-manager-biota
-      - LAB_MANAGER_PROD_LAB_VOL=lab-manager-prod-lab
-      - LAB_MANAGER_DEV_LAB_VOL=lab-manager-dev-lab
-    volumes:
-      # map the named volume to the same path as prod environment
-      - lab-manager-config:/app/conf
-      - lab-manager-prod-db:/app/gws_db/gws_core/prod/mariadb
-      - lab-manager-dev-db:/app/gws_db/gws_core/dev/mariadb
-      - lab-manager-biota:/app/gws_db/gws_biota/mariadb
-      - lab-manager-prod-lab:/app/prod/lab
-      - lab-manager-dev-lab:/app/dev/lab
-      # Volume on home to save the code
-      - lab-manager-home:/home
-      # share docker socket
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-       - gencovery-network
-    ports: 
-       - 3080:3080
-
 
   # Service to test glab locally
   # It does not uses the same volume as dev-env
@@ -157,64 +247,24 @@ services:
   #     - glab-data:/data
   #     - glab-logs:/logs
   #     - glab-settings:/conf/settings
-      # - [PATH_TO_CONFIG]/config.json:/conf/config.json
-  #   networks:
-  #      - gencovery-network
+      # - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
+      # # Share git credentials by sharing ssh private key
+      # - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
   #   ports: 
   #      - 3000:3000
   #      - 8080:8080
-  
-
-  # GWS Development DB
-  gws_core_dev_db:
-    image: mariadb:10.7.4
-    environment:
-      - MYSQL_ROOT_PASSWORD=gencovery
-      - MYSQL_USER=gws_core
-      - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=gws_core
-    ports:
-      - 3307:3306
-    networks:
-       - gencovery-network
-  
-  # Biota Development DB
-  gws_biota_db:
-    image: mariadb:10.7.4
-    environment:
-      - MYSQL_ROOT_PASSWORD=gencovery
-      - MYSQL_USER=gws_biota
-      - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=gws_biota
-    ports:
-      - 3309:3306
-    volumes:
-      - biota:/var/lib/mysql
-    networks:
-       - gencovery-network
-
-  # GWS Test db
-  test_gws_dev_db:
-    image: mariadb:10.7.4
-    environment:
-      - MYSQL_ROOT_PASSWORD=gencovery
-      - MYSQL_USER=test_gws
-      - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=test_gws
-    ports:
-      - 3308:3306
-    networks:
-       - gencovery-network
 
 volumes:
-  lab:
-  lab-app:
-  lab-data:
-  lab-logs:
-  lab-settings:
+  dev-env-app:
+   external: true
+  dev-env-data:
+   external: true
+  dev-env-logs:
+   external: true
   # Thoses volumes are used by lab-manager when running locally
   # They are used to create volume between the lab manager container and the containers created by the lab manager
   lab-manager-home:
+    external: true
   lab-manager-config:
     external: true
   lab-manager-prod-db:
@@ -225,14 +275,22 @@ volumes:
     external: true
   lab-manager-prod-lab:
     external: true
+  lab-manager-prod-data:
+    external: true
   lab-manager-dev-lab:
     external: true
-  glab-app:
-  glab-data:
-  glab-logs:
-  glab-settings:
+  central-db:
+    external: true
+  hub-db:
+    external: true
+  lab-db:
+    external: true
+  # glab-app:
+  # glab-data:
+  # glab-logs:
+  # glab-settings:
   biota:
 
 networks:
-  gencovery-network:
-    external: false
+  default:
+    name: gencovery-network

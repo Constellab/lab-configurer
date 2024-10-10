@@ -57,11 +57,19 @@ To build the dev env image see gpm repository.
 Create external volume for lab manager (required in the docker-compose file) :
 
 ``` bash
+docker volume create dev-env-app
+docker volume create dev-env-data
+docker volume create dev-env-logs
+docker volume create lab-manager-home
+docker volume create central-db
+docker volume create hub-db
+docker volume create lab-db
 docker volume create lab-manager-app
 docker volume create lab-manager-biota
 docker volume create lab-manager-prod-db
 docker volume create lab-manager-dev-db
 docker volume create lab-manager-prod-lab
+docker volume create lab-manager-prod-data
 docker volume create lab-manager-dev-lab
 docker volume create lab-manager-config
 ```
