@@ -79,19 +79,19 @@ services:
       - COMMUNITY_FRONT_URL=https://constellab.community
       - COMMUNITY_API_KEY=
       # GWS_CORE database
-      - GWS_CORE_DB_HOST=gws_core_dev_db
+      - GWS_CORE_DB_HOST=lab-db
       - GWS_CORE_DB_USER=gws_core
       - GWS_CORE_DB_PASSWORD=gencovery
       - GWS_CORE_DB_NAME=gws_core
       - GWS_CORE_DB_PORT=3306
       # Test database
-      - GWS_TEST_DB_HOST=test_gws_dev_db
+      - GWS_TEST_DB_HOST=lab-test-db
       - GWS_TEST_DB_USER=test_gws
       - GWS_TEST_DB_PASSWORD=gencovery
       - GWS_TEST_DB_NAME=test_gws
       - GWS_TEST_DB_PORT=3306
       # GWS_BIOTA database
-      - GWS_BIOTA_DB_HOST=gws_biota_db
+      - GWS_BIOTA_DB_HOST=lab-biota-db
       - GWS_BIOTA_DB_USER=gws_biota
       - GWS_BIOTA_DB_PASSWORD=gencovery
       - GWS_BIOTA_DB_NAME=gws_biota
