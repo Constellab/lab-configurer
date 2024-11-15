@@ -32,14 +32,11 @@ services:
     volumes:
       - hub-db:/var/lib/mysql
 
-  rabbitmq:
-    image: rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=password
+  redisqueue:
+    image: redis
     ports:
-      - 5672:5672
-    container_name: rabbitmq
+      - 6379:6379
+    container_name: redisqueue
 
   mail-slurper:
     image: marcopas/docker-mailslurper
@@ -66,8 +63,8 @@ services:
       - LAB_ENVIRONMENT=LOCAL
       - LAB_PROD_API_URL=http://localhost:3000
       - LAB_DEV_API_URL=http://localhost:3000
-      - CENTRAL_API_KEY=123456
-      - CENTRAL_API_URL=http://host.docker.internal:3001
+      - SPACE_API_KEY=123456
+      - SPACE_API_URL=http://host.docker.internal:3001
       - FRONT_URL=http://localhost:4200
       - FRONT_VERSION=1.0.0
       - VIRTUAL_HOST=
@@ -212,8 +209,8 @@ services:
   #     - LAB_ENVIRONMENT=LOCAL
   #     - LAB_PROD_API_URL=
   #     - LAB_DEV_API_URL=
-  #     - CENTRAL_API_KEY=
-  #     - CENTRAL_API_URL=
+  #     - SPACE_API_KEY=
+  #     - SPACE_API_URL=
   #     - FRONT_URL=
   #     - FRONT_VERSION=
   #     - VIRTUAL_HOST=
