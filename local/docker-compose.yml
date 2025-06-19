@@ -42,7 +42,7 @@ services:
     image: marcopas/docker-mailslurper
     ports:
       - "2500:2500"
-      - "8081:8080"
+      - "8086:8080"
       - "8085:8085"
     container_name: mail-slurper
 
