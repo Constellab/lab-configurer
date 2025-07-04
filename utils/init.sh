@@ -1,74 +1,112 @@
 #!/bin/bash
 
-# Create the required networks
-if [[ "$(docker network ls | grep "gencovery-network-manager")" == "" ]] ; then
-  docker network create -d bridge gencovery-network-manager
-fi
+# Function to create required Docker networks
+create_docker_networks() {
+  local networks=("gencovery-network-manager" "gencovery-network-dev" "gencovery-network-prod")
+  
+  for network in "${networks[@]}"; do
+    if [[ "$(docker network ls | grep "$network")" == "" ]]; then
+      docker network create -d bridge "$network"
+    fi
+  done
+}
 
-if [[ "$(docker network ls | grep "gencovery-network-dev")" == "" ]] ; then
-  docker network create -d bridge gencovery-network-dev
-fi
+# Function to set environment variable
+set_environment_variable() {
+  local var_name="$1"
+  local var_value="$2"
+  
+  sudo sed -i "/$var_name/d" /etc/environment
+  sudo sh -c "echo $var_name=$var_value >> /etc/environment"
+  export "$var_name=$var_value"
+}
 
-if [[ "$(docker network ls | grep "gencovery-network-prod")" == "" ]] ; then
-  docker network create -d bridge gencovery-network-prod
-fi
+# Function to parse command line arguments
+parse_arguments() {
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --virtual-host=*)
+        VIRTUAL_HOST="${1#*=}"
+        shift
+        ;;
+      --environment-profile=*)
+        ENVIRONMENT_PROFILE="${1#*=}"
+        shift
+        ;;
+      --lab-manager-api-key=*)
+        LAB_MANAGER_API_KEY="${1#*=}"
+        shift
+        ;;
+      --lab-manager-version=*)
+        LAB_MANAGER_VERSION="${1#*=}"
+        shift
+        ;;
+      --dns-challenge-enabled=*)
+        DNS_CHALLENGE_ENABLED="${1#*=}"
+        shift
+        ;;
+      --dns-challenge-provider=*)
+        DNS_CHALLENGE_PROVIDER="${1#*=}"
+        shift
+        ;;
+      --dns-challenge-route=*)
+        DNS_CHALLENGE_ROUTE="${1#*=}"
+        shift
+        ;;
+      *)
+        echo "Unknown parameter passed: $1"
+        exit 1
+        ;;
+    esac
+  done
+}
+
+# Function to validate required parameters
+validate_parameters() {
+  if [[ -z "$VIRTUAL_HOST" ]] || [[ -z "$ENVIRONMENT_PROFILE" ]] || [[ -z "$LAB_MANAGER_API_KEY" ]] || [[ -z "$LAB_MANAGER_VERSION" ]]; then
+    echo "Missing parameters"
+    echo "Usage: ./init.sh --virtual-host=<VIRTUAL_HOST> --environment-profile=<ENVIRONMENT_PROFILE> --lab-manager-api-key=<LAB_MANAGER_API_KEY> --lab-manager-version=<LAB_MANAGER_VERSION> [--dns-challenge-enabled=<true|false>] [--dns-challenge-provider=<PROVIDER>] [--dns-challenge-route=<ROUTE>]"
+    echo "Example: ./init.sh --virtual-host=\"*.gencovery.io\" --environment-profile=\"prod\" --lab-manager-api-key=\"1234567890abcdefg\" --lab-manager-version=\"1.0.0\" --dns-challenge-enabled=\"true\" --dns-challenge-provider=\"cloudflare\" --dns-challenge-route=\"/dns/challenge\""
+    exit 1
+  fi
+}
+
+# Create Docker networks
+create_docker_networks
 
 # Initialize variables
 VIRTUAL_HOST=""
 ENVIRONMENT_PROFILE=""
 LAB_MANAGER_API_KEY=""
 LAB_MANAGER_VERSION=""
-# Parse the arguments
-while [[ "$#" -gt 0 ]]; do
-  case "$1" in
-    --virtual-host=*)
-      VIRTUAL_HOST="${1#*=}"
-      shift
-      ;;
-    --environment-profile=*)
-      ENVIRONMENT_PROFILE="${1#*=}"
-      shift
-      ;;
-    --lab-manager-api-key=*)
-      LAB_MANAGER_API_KEY="${1#*=}"
-      shift
-      ;;
-    --lab-manager-version=*)
-      LAB_MANAGER_VERSION="${1#*=}"
-      shift
-      ;;
-    *)
-      echo "Unknown parameter passed: $1"
-      exit 1
-      ;;
-  esac
-done
+DNS_CHALLENGE_ENABLED=""
+DNS_CHALLENGE_PROVIDER=""
+DNS_CHALLENGE_ROUTE=""
 
-# Check if all required parameters are set
-if [[ -z "$VIRTUAL_HOST" ]] || [[ -z "$ENVIRONMENT_PROFILE" ]] || [[ -z "$LAB_MANAGER_API_KEY" ]] || [[ -z "$LAB_MANAGER_VERSION" ]]; then
-  echo "Missing parameters"
-  echo "Usage: ./init.sh --virtual-host=<VIRTUAL_HOST> --environment-profile=<ENVIRONMENT_PROFILE> --lab-manager-api-key=<LAB_MANAGER_API_KEY> --lab-manager-version=<LAB_MANAGER_VERSION>"
-  echo "Example: ./init.sh --virtual-host=\"*.gencovery.io\" --environment-profile=\"prod\" --lab-manager-api-key=\"1234567890abcdefg\" --lab-manager-version=\"1.0.0\""
-  exit 1
+# Parse arguments
+parse_arguments "$@"
+
+# Validate required parameters
+validate_parameters
+
+# Set environment variables
+set_environment_variable "VIRTUAL_HOST" "$VIRTUAL_HOST"
+set_environment_variable "ENVIRONMENT_PROFILE" "$ENVIRONMENT_PROFILE"
+set_environment_variable "LAB_MANAGER_API_KEY" "$LAB_MANAGER_API_KEY"
+set_environment_variable "LAB_MANAGER_VERSION" "$LAB_MANAGER_VERSION"
+
+# Set DNS challenge variables if provided
+if [[ -n "$DNS_CHALLENGE_ENABLED" ]]; then
+  set_environment_variable "DNS_CHALLENGE_ENABLED" "$DNS_CHALLENGE_ENABLED"
 fi
 
-# Set the environment variables
-sudo sed -i "/VIRTUAL_HOST/d" /etc/environment
-sudo sh -c "echo VIRTUAL_HOST=$VIRTUAL_HOST >> /etc/environment"
-export VIRTUAL_HOST=$VIRTUAL_HOST
+if [[ -n "$DNS_CHALLENGE_PROVIDER" ]]; then
+  set_environment_variable "DNS_CHALLENGE_PROVIDER" "$DNS_CHALLENGE_PROVIDER"
+fi
 
-sudo sed -i "/ENVIRONMENT_PROFILE/d" /etc/environment
-sudo sh -c "echo ENVIRONMENT_PROFILE=$ENVIRONMENT_PROFILE >> /etc/environment"
-export ENVIRONMENT_PROFILE=$ENVIRONMENT_PROFILE
-
-sudo sed -i "/LAB_MANAGER_API_KEY/d" /etc/environment
-sudo sh -c "echo LAB_MANAGER_API_KEY=$LAB_MANAGER_API_KEY >> /etc/environment"
-export LAB_MANAGER_API_KEY=$LAB_MANAGER_API_KEY
-
-sudo sed -i "/LAB_MANAGER_VERSION/d" /etc/environment
-sudo sh -c "echo LAB_MANAGER_VERSION=$LAB_MANAGER_VERSION >> /etc/environment"
-export LAB_MANAGER_VERSION=$LAB_MANAGER_VERSION
-
+if [[ -n "$DNS_CHALLENGE_ROUTE" ]]; then
+  set_environment_variable "DNS_CHALLENGE_ROUTE" "$DNS_CHALLENGE_ROUTE"
+fi
 
 # Enable firewall using ufw
 # Check UFW status

@@ -23,6 +23,11 @@ services:
       # Enable HTTPS
       - "traefik.http.routers.lab-manager-router.entrypoints=websecure"
       - "traefik.http.routers.lab-manager-router.tls.certresolver=myresolver"
+      - "traefik.http.routers.lab-manager-router.tls=true"
+
+      # Here define the domains for the TLS certificate
+      # This make the reverse proxy generate a wildcard certificate for all subdomains
+      - "traefik.http.routers.lab-manager-router.tls.domains[0].main=*.${VIRTUAL_HOST}"    # Covers all subdomains
     networks:
       - gencovery-network-manager
     restart: always
@@ -38,7 +43,13 @@ services:
       - "--providers.docker.exposedbydefault=false"
       # Enable HTTPS
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # Change from tlschallenge to dnschallenge with Space API
+      # We need to use DNS challenge to get wildcard certificates
+      # to limit the number of requests of certificates to Let's Encrypt
+      # as the limit for a domain is 50 per week
+      - "--certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE_ENABLED:-false}"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-httpreq}"
+      - "--certificatesresolvers.myresolver.acme.email=admin@gencovery.com"
       # Email for let's encrypt
       - "--certificatesresolvers.myresolver.acme.email=admin@gencovery.com"
       # Json file to store certificate
@@ -49,7 +60,13 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
-      # - "--log.level=DEBUG"
+
+    
+      #- "--log.level=DEBUG"
+    environment:
+      # Define the HTTP request endpoint for DNS challenges
+      # This endpoint should be provided by the Space API
+      - "HTTPREQ_ENDPOINT=${DNS_CHALLENGE_ROUTE}"
     ports:
       - "443:443"
       - "80:80"
