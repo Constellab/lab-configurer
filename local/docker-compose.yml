@@ -54,7 +54,7 @@ services:
   
   # Environment to code in remote container in linux
   dev-env:
-    image: local-dev-env
+    image: constellab/lab-dev-env
     environment:
       - LAB_NAME=MyLab
       - LAB_TOKEN=123456
