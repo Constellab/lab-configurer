@@ -48,7 +48,7 @@ services:
       # We need to use DNS challenge to get wildcard certificates
       # to limit the number of requests of certificates to Let's Encrypt
       # as the limit for a domain is 50 per week
-      - "--certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE_ENABLED:-'false'}"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE_ENABLED:-false}"
       - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-httpreq}"
       - "--certificatesresolvers.myresolver.acme.email=admin@gencovery.com"
       # Email for let's encrypt
