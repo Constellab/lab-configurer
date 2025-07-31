@@ -2,7 +2,6 @@
 # It create a glab container that run with a config similar to the one used in production
 # TO run this file, in the local folder execute : 
 # docker-compose -f .\glab\docker-compose.yml --env-file ./.env up -d local-glab
-version: "3"
 
 services:
   

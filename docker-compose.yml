@@ -1,5 +1,3 @@
-version: "3"
-
 services:
 
   # Production Glab
@@ -14,6 +12,7 @@ services:
       - VIRTUAL_HOST=${VIRTUAL_HOST}
       - LAB_MANAGER_API_KEY=${LAB_MANAGER_API_KEY}
       - ENVIRONMENT_PROFILE=${ENVIRONMENT_PROFILE} # pre-prod or prod
+      - AUTO_START_LAB=true
     labels:
       - "traefik.enable=true"
       # Config for the HTTPS glab domain to port 3080

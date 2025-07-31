@@ -1,5 +1,3 @@
-
-
 # This file is used for development puprose
 # It only create the clab to work locally
 # It is not supposed to be deployed
@@ -51,7 +49,14 @@ services:
     ports:
       - 8082:8080
 
-  
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 8083:80
+    volumes:
+      - C:\Users\benji\Downloads\frontend:/usr/share/nginx/html:ro
+    container_name: nginx-server
+
   # Environment to code in remote container in linux
   dev-env:
     image: constellab/lab-dev-env
