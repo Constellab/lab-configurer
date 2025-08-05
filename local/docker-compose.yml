@@ -4,7 +4,7 @@
 name: dev-env
 services:
 
-  central:
+  space_db:
     image: mariadb:10
     environment:
       - MYSQL_ROOT_PASSWORD=gencoveryDb
@@ -13,11 +13,11 @@ services:
       - MYSQL_DATABASE=gencoveryDb
     ports:
       - 3306:3306
-    container_name: central-db
+    container_name: space-db
     volumes:
-      - central-db:/var/lib/mysql
+      - space-db:/var/lib/mysql
 
-  hub:
+  community_db:
     image: mariadb:10
     environment:
       - MYSQL_ROOT_PASSWORD=gencoveryDb
@@ -26,9 +26,9 @@ services:
       - MYSQL_DATABASE=hubDb
     ports:
       - 3310:3306
-    container_name: hub-db
+    container_name: community-db
     volumes:
-      - hub-db:/var/lib/mysql
+      - community-db:/var/lib/mysql
 
   redisqueue:
     image: redis
@@ -281,9 +281,9 @@ volumes:
     external: true
   lab-manager-dev-lab:
     external: true
-  central-db:
+  space-db:
     external: true
-  hub-db:
+  community-db:
     external: true
   lab-db:
     external: true

@@ -63,8 +63,8 @@ docker volume create dev-env-app
 docker volume create dev-env-data
 docker volume create dev-env-logs
 docker volume create lab-manager-home
-docker volume create central-db
-docker volume create hub-db
+docker volume create space-db
+docker volume create community-db
 docker volume create lab-db
 docker volume create lab-manager-app
 docker volume create lab-manager-biota
