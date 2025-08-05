@@ -106,7 +106,7 @@ services:
       - dev-env-app:/lab
       - dev-env-data:/data
       - dev-env-logs:/logs
-      - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
+      - ./config-file.json:/conf/config.json
       # Share git credentials by sharing ssh private key
       - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
     ports: 

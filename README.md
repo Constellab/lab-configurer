@@ -50,9 +50,11 @@ Clic on ```INIT ALL```. Refresh regularly and the lab should be up after some ti
 
 That's it
 
-## Dev environment glab
+## Lab dev environment
 
-To build the dev env image see gpm repository.
+This environment is useful to develop within the lab locally. At gencovery we mainly use it to work on the gws_core brick. 
+
+To start this dev environment container folow the steps below.
 
 Create external volume for lab manager (required in the docker-compose file) :
 
@@ -77,7 +79,10 @@ docker volume create lab-manager-config
 To create the containers :
 
  1. create a ```.env``` file in the local folder with ```OPENAI_API_KEY```
- 2. execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d```
+ 2. [Optional] modify the ```config-file.json``` file in the local folder with the brick you want to install. You can install the brick manually later directly in the lab.
+ 3. execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d```
+
+The lab dev environment image is define here : <https://hub.docker.com/repository/docker/constellab/lab-dev-env/general>. If you want to build the lab dev env image see gpm repository.
 
 ## Dev environment lab manager
 

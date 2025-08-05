@@ -1,6 +1,6 @@
 {
-    "lab_id": "TO SET",
-    "name": "My lab",
+    "lab_id": "123456",
+    "name": "My local lab",
     "front_version": "2.5.3",
     "glab_tag": "2.10.0",
     "biota_maria_db_url": null,
