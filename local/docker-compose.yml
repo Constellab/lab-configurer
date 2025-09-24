@@ -99,6 +99,7 @@ services:
       - GWS_BIOTA_DB_NAME=gws_biota
       - GWS_BIOTA_DB_PORT=3306
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REFLEX_ACCESS_TOKEN=${REFLEX_ACCESS_TOKEN}
     # Set your own path on the volume  
     volumes:
       # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
