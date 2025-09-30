@@ -3,7 +3,6 @@
 # It is not supposed to be deployed
 name: dev-env
 services:
-
   space_db:
     image: mariadb:10
     environment:
@@ -48,14 +47,10 @@ services:
     image: adminer
     ports:
       - 8082:8080
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - 8083:80
-    volumes:
-      - C:\Users\benji\Downloads\frontend:/usr/share/nginx/html:ro
-    container_name: nginx-server
+    networks:
+      - default
+      - gencovery-network-dev
+      - gencovery-network-prod
 
   # Environment to code in remote container in linux
   dev-env:
@@ -68,6 +63,7 @@ services:
       - LAB_ENVIRONMENT=LOCAL
       - LAB_PROD_API_URL=http://localhost:3000
       - LAB_DEV_API_URL=http://localhost:3000
+      - LAB_MANAGER_API_URL=http://lab-manager-dev-env:3080
       - SPACE_API_KEY=123456
       - SPACE_API_URL=http://host.docker.internal:3001
       - FRONT_URL=http://localhost:4200
@@ -100,7 +96,7 @@ services:
       - GWS_BIOTA_DB_PORT=3306
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - REFLEX_ACCESS_TOKEN=${REFLEX_ACCESS_TOKEN}
-    # Set your own path on the volume  
+    # Set your own path on the volume
     volumes:
       # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
@@ -110,12 +106,13 @@ services:
       - ./config-file.json:/conf/config.json
       # Share git credentials by sharing ssh private key
       - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
-    ports: 
-       - 3000:3000
-       - 8080:8080
-
+    ports:
+      - 3000:3000
+      - 8080:8080
     container_name: lab-dev-env
-
+    networks:
+      - gencovery-network-dev
+      - gencovery-network-prod
 
   # Lab manager
   lab-manager-dev-env:
@@ -138,10 +135,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       # Share git credentials by sharing ssh private key
       - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
-    ports: 
-       - 3080:3080
+    ports:
+      - 3080:3080
     container_name: lab-manager-dev-env
-  
+    networks:
+      - gencovery-network-dev
+      - gencovery-network-prod
+
   # GWS Development DB
   lab-db:
     image: mariadb:10.7.4
@@ -155,7 +155,10 @@ services:
     container_name: lab-db
     volumes:
       - lab-db:/var/lib/mysql
-  
+    networks:
+      - gencovery-network-dev
+      - gencovery-network-prod
+
   # Biota Development DB
   lab-biota-db:
     image: mariadb:10.7.4
@@ -169,6 +172,9 @@ services:
     volumes:
       - biota:/var/lib/mysql
     container_name: lab-biota-db
+    networks:
+      - gencovery-network-dev
+      - gencovery-network-prod
 
   # GWS Test db
   lab-test-db:
@@ -181,6 +187,9 @@ services:
     ports:
       - 3308:3306
     container_name: lab-test-db
+    networks:
+      - gencovery-network-dev
+      - gencovery-network-prod
 
   # Run the codelab in local with same volume as dev-env
   # The local-codelab image must be built before from GPM package
@@ -191,7 +200,7 @@ services:
   #     - COMMUNITY_API_URL=https://api.constellab.community
   #     - COMMUNITY_FRONT_URL=https://constellab.community
   #     - COMMUNITY_API_KEY=
-  #   ports: 
+  #   ports:
   #      - 8081:8080
   #   volumes:
   #     # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
@@ -200,7 +209,6 @@ services:
   #     - lab-data:/data
   #     - lab-logs:/logs
   #     - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
-     
 
   # Service to test glab locally
   # It does not uses the same volume as dev-env
@@ -242,7 +250,7 @@ services:
   #   depends_on:
   #     - gws_core_dev_db
   #     # - gws_biota_dev_db
-  #   # Set your own path on the volume  
+  #   # Set your own path on the volume
   #   volumes:
   #     # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
   #     # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
@@ -250,20 +258,20 @@ services:
   #     - glab-data:/data
   #     - glab-logs:/logs
   #     - glab-settings:/conf/settings
-      # - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
-      # # Share git credentials by sharing ssh private key
-      # - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
-  #   ports: 
+  # - C:\\Users\\benji\\Documents\\Projects\\Gencovery\\dev-env\\config.json:/conf/config.json
+  # # Share git credentials by sharing ssh private key
+  # - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
+  #   ports:
   #      - 3000:3000
   #      - 8080:8080
 
 volumes:
   dev-env-app:
-   external: true
+    external: true
   dev-env-data:
-   external: true
+    external: true
   dev-env-logs:
-   external: true
+    external: true
   # Thoses volumes are used by lab-manager when running locally
   # They are used to create volume between the lab manager container and the containers created by the lab manager
   lab-manager-home:
@@ -297,3 +305,7 @@ volumes:
 networks:
   default:
     name: gencovery-network
+  gencovery-network-dev:
+    external: true
+  gencovery-network-prod:
+    external: true
