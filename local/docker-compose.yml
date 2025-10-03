@@ -102,10 +102,9 @@ services:
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
       - dev-env-app:/lab
       - dev-env-data:/data
-      - dev-env-logs:/logs
       - ./config-file.json:/conf/config.json
       # Share git credentials by sharing ssh private key
-      - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
+      - C:\Users\benji\.ssh\gencovery-github:/home/labuser/.ssh/id_rsa
     ports:
       - 3000:3000
       - 8080:8080
@@ -118,7 +117,7 @@ services:
   lab-manager-dev-env:
     image: local-lab-manager
     environment:
-      - VOLUME_PATH=/app/conf
+      - VOLUME_PATH=/app
       - VIRTUAL_HOST=localhost
     volumes:
       # map the named volume to the same path as prod environment
@@ -268,8 +267,6 @@ volumes:
   dev-env-app:
     external: true
   dev-env-data:
-    external: true
-  dev-env-logs:
     external: true
   # Thoses volumes are used by lab-manager when running locally
   # They are used to create volume between the lab manager container and the containers created by the lab manager

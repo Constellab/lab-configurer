@@ -1,7 +1,6 @@
 version: "3"
 
 services:
-
   # Production Glab
   lab_manager:
     image: constellab/lab-manager:${LAB_MANAGER_VERSION}
@@ -9,7 +8,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /app:/app
     environment:
-      - VOLUME_PATH=/app/conf
+      - VOLUME_PATH=/app
       - LOG_PATH=/app/lab_manager/logs
       - VIRTUAL_HOST=${VIRTUAL_HOST}
       - LAB_MANAGER_API_KEY=${LAB_MANAGER_API_KEY}
@@ -28,7 +27,7 @@ services:
 
       # Here define the domains for the TLS certificate
       # This make the reverse proxy generate a wildcard certificate for all subdomains
-      - "traefik.http.routers.lab-manager-router.tls.domains[0].main=*.${VIRTUAL_HOST}"    # Covers all subdomains
+      - "traefik.http.routers.lab-manager-router.tls.domains[0].main=*.${VIRTUAL_HOST}" # Covers all subdomains
     networks:
       - gencovery-network-manager
     restart: always
@@ -62,7 +61,6 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
 
-    
       #- "--log.level=DEBUG"
     environment:
       # Define the HTTP request endpoint for DNS challenges
