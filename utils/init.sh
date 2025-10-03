@@ -125,3 +125,25 @@ else
     sudo ufw allow 443
     sudo ufw --force enable
 fi
+
+# Set folders permissions
+echo "[INFO] Changing ownership of /app to ubuntu:ubuntu..."
+sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown ubuntu:ubuntu {} +
+echo "[INFO] Ownership change completed"
+
+# Change ownership of /app/dev/etc-ssh and /app/docker to root:root
+if [ "$(stat -c '%U' /app/dev/etc-ssh)" != "root" ]; then
+    echo "[INFO] Changing ownership of /app/dev/etc-ssh to root:root..."
+    sudo chown -R root:root /app/dev/etc-ssh
+    echo "[INFO] Ownership change completed"
+else
+    echo "[INFO] /app/dev/etc-ssh is already owned by root"
+fi
+
+if [ "$(stat -c '%U' /app/docker)" != "root" ]; then
+    echo "[INFO] Changing ownership of /app/docker to root:root..."
+    sudo chown -R root:root /app/docker
+    echo "[INFO] Ownership change completed"
+else
+    echo "[INFO] /app/docker is already owned by root"
+fi
