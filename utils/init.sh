@@ -127,9 +127,13 @@ else
 fi
 
 # Set folders permissions
-echo "[INFO] Changing ownership of /app to ubuntu:ubuntu..."
-sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown ubuntu:ubuntu {} +
-echo "[INFO] Ownership change completed"
+if [ "$(stat -c '%U' /app)" != "ubuntu" ]; then
+    echo "[INFO] Changing ownership of /app to ubuntu:ubuntu..."
+    sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown ubuntu:ubuntu {} +
+    echo "[INFO] Ownership change completed"
+else
+    echo "[INFO] /app is already owned by ubuntu"
+fi
 
 # Change ownership of /app/dev/etc-ssh and /app/docker to root:root
 if [ "$(stat -c '%U' /app/dev/etc-ssh)" != "root" ]; then
