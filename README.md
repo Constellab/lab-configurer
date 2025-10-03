@@ -73,6 +73,7 @@ docker volume create lab-manager-dev-db
 docker volume create lab-manager-prod-lab
 docker volume create lab-manager-prod-data
 docker volume create lab-manager-dev-lab
+docker volume create lab-manager-dev-data
 docker volume create lab-manager-config
 ```
 
@@ -88,7 +89,7 @@ The lab dev environment image is define here : <https://hub.docker.com/repositor
 
 In lab manager folder exec : ```docker build -t local-lab-manager .```
 
-execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d lab-manager```
+execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d lab-manager-dev-env```
 
 Pull the code of lab manager in the /home folder (saved in volume)
 

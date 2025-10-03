@@ -129,14 +129,13 @@ services:
       - lab-manager-prod-lab:/app/prod/lab
       - lab-manager-prod-data:/app/prod/data
       - lab-manager-dev-lab:/app/dev/lab
+      - lab-manager-dev-data:/app/dev/data
       # Volume on home to save the code
       - lab-manager-home:/home
       # share docker socket
       - /var/run/docker.sock:/var/run/docker.sock
       # Share git credentials by sharing ssh private key
-      - C:\Users\benji\.ssh\gencovery-github:/root/.ssh/id_rsa
-    ports:
-      - 3080:3080
+      - C:\Users\benji\.ssh\gencovery-github:/home/labuser/.ssh/id_rsa
     container_name: lab-manager-dev-env
     networks:
       - gencovery-network-dev
@@ -289,6 +288,8 @@ volumes:
   lab-manager-prod-data:
     external: true
   lab-manager-dev-lab:
+    external: true
+  lab-manager-dev-data:
     external: true
   space-db:
     external: true

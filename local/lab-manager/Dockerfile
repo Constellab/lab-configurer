@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV NODE_VERSION=20.12.2
 # don't name it PIP_VERSION because it will be overwritten by pip
 ENV CUSTOM_PIP_VERSION=24.0
-ENV CUSTOM_RCLONE_VERSION=1.53.3-4ubuntu1.22.04.2
+ENV CUSTOM_RCLONE_VERSION=1.53.3-4ubuntu1.22.04.3
 ENV DOCKER_COMPOSE_VERSION=2.26.1
 
 # Install docker
@@ -26,14 +26,10 @@ RUN echo \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt-get update && apt-get -y install docker-ce docker-ce-cli containerd.io
 
-# Install node of a specific version
+# Install node of a specific version globally
 RUN apt-get update && apt install -y curl
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-ENV NVM_DIR=/root/.nvm
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
-ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
 
 # Install docker compose
 RUN curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -44,7 +40,7 @@ RUN chmod +x /usr/local/bin/docker-compose
 RUN apt-get -y update && \
     apt-get -y install jq && \
     apt-get -y install python3.10 python3-distutils && \
-    apt-get -y install git curl zip unzip bzip2 wget rsync && \
+    apt-get -y install git curl zip unzip bzip2 wget rsync sudo && \
     apt-get -y install pipenv && \
     # # for lspci
     apt-get -y install pciutils 
@@ -69,4 +65,19 @@ RUN npm i -g @nestjs/cli
 COPY entrypoint.sh /entrypoint.sh
 RUN sed -i -e 's/\r$//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# Create non-root user matching host ubuntu user
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+# Create group and user, then change ownership of necessary directories
+RUN groupadd -g ${GROUP_ID} labuser && \
+    useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash labuser && \
+    # add labuser to docker group
+    usermod -aG docker labuser && \
+    # give sudo permission to labuser
+    echo "labuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER labuser
+
 ENTRYPOINT [ "/entrypoint.sh" ]
