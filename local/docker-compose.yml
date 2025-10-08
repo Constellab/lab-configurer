@@ -102,6 +102,7 @@ services:
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
       - dev-env-app:/lab
       - dev-env-data:/data
+      # TODO TO FIX, this is created with root permission, so labuser cannot read /conf
       - ./config-file.json:/conf/config.json
       # Share git credentials by sharing ssh private key
       - C:\Users\benji\.ssh\gencovery-github:/home/labuser/.ssh/id_rsa

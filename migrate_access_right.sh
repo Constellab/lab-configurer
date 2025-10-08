@@ -12,6 +12,18 @@ echo "[INFO] Changing ownership of /app/dev/etc-ssh to root:root..."
 sudo chown -R root:root /app/dev/etc-ssh
 echo "[INFO] Ownership change completed"
 
+# Set permissions for /app/prod/data/filestore and children
+echo "[INFO] Setting permissions for filestore and its children..."
+
+# Set permissions for filestore directory and children
+if [ -d "/app/prod/data/filestore" ]; then
+    sudo chmod -R 644 /app/prod/data/filestore
+fi
+
+if [ -d "/app/dev/data/filestore" ]; then
+    sudo chmod -R 644 /app/dev/data/filestore
+fi
+
 # Move logs directories if they exist
 if [ -d "/app/prod/logs" ]; then
     echo "[INFO] Moving /app/prod/logs to /app/prod/lab/.sys/logs..."
