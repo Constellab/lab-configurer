@@ -17,11 +17,13 @@ echo "[INFO] Setting permissions for filestore and its children..."
 
 # Set permissions for filestore directory and children
 if [ -d "/app/prod/data/filestore" ]; then
-    sudo chmod -R 644 /app/prod/data/filestore
+    sudo find /app/prod/data/filestore -type d -exec chmod 755 {} +
+    sudo find /app/prod/data/filestore -type f -exec chmod 644 {} +
 fi
 
 if [ -d "/app/dev/data/filestore" ]; then
-    sudo chmod -R 644 /app/dev/data/filestore
+    sudo find /app/dev/data/filestore -type d -exec chmod 755 {} +
+    sudo find /app/dev/data/filestore -type f -exec chmod 644 {} +
 fi
 
 # Move logs directories if they exist
@@ -41,4 +43,9 @@ else
     echo "[INFO] /app/dev/logs does not exist, skipping..."
 fi
 
+# this seems useful to allow lab manager to access docker socket
+echo "[INFO] Restart docker system services..."
+sudo systemctl restart docker
+
 echo "[INFO] Access rights migration completed successfully"
+
