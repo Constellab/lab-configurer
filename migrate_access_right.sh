@@ -1,6 +1,15 @@
 #!/bin/bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+
+
 echo "[INFO] Starting access rights migration..."
+
+echo "[INFO] Stopping docker containers..."
+sudo systemctl stop docker
+sudo systemctl stop docker.socket
+echo "[INFO] Docker containers stopped"
 
 # Change ownership of /app to ubuntu:ubuntu, excluding /app/dev/etc-ssh and mariadb directories
 echo "[INFO] Changing ownership of /app to ubuntu:ubuntu..."
@@ -43,9 +52,14 @@ else
     echo "[INFO] /app/dev/logs does not exist, skipping..."
 fi
 
+# Migrate docker GID to 999
+echo "[INFO] Migrating docker GID to 999..."
+sudo bash "${SCRIPT_DIR}/ensure_docker_gid.sh"
+echo "[INFO] Docker GID migration completed"
+
 # this seems useful to allow lab manager to access docker socket
 echo "[INFO] Restart docker system services..."
-sudo systemctl restart docker
+sudo systemctl start docker
 
 echo "[INFO] Access rights migration completed successfully"
 
