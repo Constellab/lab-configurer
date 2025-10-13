@@ -4,7 +4,7 @@ echo "[INFO] Starting access rights migration..."
 
 # Change ownership of /app to ubuntu:ubuntu, excluding /app/dev/etc-ssh and mariadb directories
 echo "[INFO] Changing ownership of /app to ubuntu:ubuntu..."
-sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown ubuntu:ubuntu {} +
+sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown -h ubuntu:ubuntu {} +
 echo "[INFO] Ownership change completed"
 
 # Change ownership of /app/dev/etc-ssh to root:root
