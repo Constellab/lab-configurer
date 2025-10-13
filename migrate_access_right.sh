@@ -54,7 +54,7 @@ fi
 
 # Migrate docker GID to 999
 echo "[INFO] Migrating docker GID to 999..."
-sudo bash "${SCRIPT_DIR}/ensure_docker_gid.sh"
+sudo bash "${SCRIPT_DIR}/utils/ensure_docker_gid.sh"
 echo "[INFO] Docker GID migration completed"
 
 # this seems useful to allow lab manager to access docker socket
