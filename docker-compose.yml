@@ -1,7 +1,4 @@
-version: "3"
-
 services:
-  # Production Glab
   lab_manager:
     image: constellab/lab-manager:${LAB_MANAGER_VERSION}
     volumes:
@@ -35,8 +32,8 @@ services:
 
   # Traefik reverse proxy
   reverse-proxy:
-    # The official v2 Traefik docker image
-    image: traefik:v2.11.0
+    # Use a stable Traefik v3 version
+    image: traefik:v3.6.0
     command:
       # So that Traefik can listen to the Docker events
       - "--providers.docker=true"
