@@ -33,7 +33,7 @@ services:
   # Traefik reverse proxy
   reverse-proxy:
     # The official v2 Traefik docker image
-    image: traefik:v2.11.0
+    image: traefik:v3.6.1
     command:
       # So that Traefik can listen to the Docker events
       - "--providers.docker=true"

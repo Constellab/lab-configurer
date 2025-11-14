@@ -71,6 +71,22 @@ validate_parameters() {
   fi
 }
 
+# Function to create required directories
+create_required_directories() {
+  local directories=(
+    "/app"
+    "/app/dev/etc-ssh"
+    "/app/docker"
+  )
+  
+  for dir in "${directories[@]}"; do
+    if [[ ! -d "$dir" ]]; then
+      echo "[INFO] Creating directory: $dir"
+      sudo mkdir -p "$dir"
+    fi
+  done
+}
+
 # Create Docker networks
 create_docker_networks
 
@@ -126,13 +142,17 @@ else
     sudo ufw --force enable
 fi
 
+# Create required directories
+create_required_directories
+
+
 # Set folders permissions
-if [ "$(stat -c '%U' /app)" != "ubuntu" ]; then
-    echo "[INFO] Changing ownership of /app to ubuntu:ubuntu..."
-    sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown ubuntu:ubuntu {} +
+if [ "$(stat -c '%U' /app)" != "$USER" ]; then
+    echo "[INFO] Changing ownership of /app to $USER:$USER..."
+    sudo chown "$USER:$USER" /app
     echo "[INFO] Ownership change completed"
 else
-    echo "[INFO] /app is already owned by ubuntu"
+    echo "[INFO] /app is already owned by $USER"
 fi
 
 # Change ownership of /app/dev/etc-ssh and /app/docker to root:root

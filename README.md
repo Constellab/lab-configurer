@@ -24,14 +24,14 @@ Connect into the constellab (prod or pre-prod) and create a new lab instance wit
 
 To deploy a lab, connect into the server in ssh.
 
- 1. ```cd /home/ubuntu```
+ 1. ```cd ~```
  2. ```git clone https://github.com/Constellab/lab-configurer.git```
  3. ```cd lab-configurer/utils```
  4. ```bash prepare_server.sh```
  5. Reboot server ```sudo reboot```
- 6. Relog and go to lab-configurer ```cd /home/ubuntu/lab-configurer```
+ 6. Relog and go to lab-configurer ```cd ~/lab-configurer```
  7. ```sudo bash utils/init.sh```
- 8. Logout and login for the env variable to be set, then ```cd /home/ubuntu/lab-configurer```
+ 8. Logout and login for the env variable to be set, then ```cd ~/lab-configurer```
  9. Start the lab manager and reverse proxy. In lab-configurer folder ```docker-compose up -d```
 
 ### Config in Constellab
