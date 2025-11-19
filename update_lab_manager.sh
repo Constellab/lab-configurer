@@ -21,8 +21,8 @@ fi
 
 
 # Script to update the lab manager container
-docker-compose pull lab_manager
+docker compose pull lab_manager
 
-docker-compose down
+docker compose down
 
-docker-compose up -d
+docker compose up -d

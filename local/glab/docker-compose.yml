@@ -1,10 +1,9 @@
 # This file is used for development puprose
 # It create a glab container that run with a config similar to the one used in production
-# TO run this file, in the local folder execute : 
-# docker-compose -f .\glab\docker-compose.yml --env-file ./.env up -d local-glab
+# TO run this file, in the local folder execute :
+# docker compose -f .\glab\docker-compose.yml --env-file ./.env up -d local-glab
 
 services:
-  
   local-glab:
     image: glab:latest
     environment:
@@ -36,7 +35,7 @@ services:
     depends_on:
       - gws_core_dev_db_glab
       # - gws_biota_dev_db
-    # Set your own path on the volume  
+    # Set your own path on the volume
     volumes:
       # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
@@ -46,13 +45,10 @@ services:
       - glab-settings:/conf/settings
       # - [PATH TO CONFIG JSON]\\config.json:/conf/config.json
     networks:
-       - gencovery-network-glab
-    ports: 
-       - 3000:3000
-       - 8080:8080
-    
-
-  
+      - gencovery-network-glab
+    ports:
+      - 3000:3000
+      - 8080:8080
 
   # GWS Development DB
   gws_core_dev_db_glab:
@@ -65,8 +61,8 @@ services:
     ports:
       - 3317:3306
     networks:
-       - gencovery-network-glab
-  
+      - gencovery-network-glab
+
 volumes:
   glab-app:
   glab-data:

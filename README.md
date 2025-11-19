@@ -32,7 +32,7 @@ To deploy a lab, connect into the server in ssh.
  6. Relog and go to lab-configurer ```cd ~/lab-configurer```
  7. ```sudo bash utils/init.sh```
  8. Logout and login for the env variable to be set, then ```cd ~/lab-configurer```
- 9. Start the lab manager and reverse proxy. In lab-configurer folder ```docker-compose up -d```
+ 9. Start the lab manager and reverse proxy. In lab-configurer folder ```docker compose up -d```
 
 ### Config in Constellab
 
@@ -126,7 +126,7 @@ Otherwise the certificate must be generated manually and uploaded to the server 
 10. Execute the init file to setup default environment variables ```sudo bash utils/init.sh``` .Info can be found in constellab.
 11. Exit the session and reconnect to the server to have the environment variables set
 12. Go to the lab-configurer folder
-13. Start the lab manager and the reverse proxy ```docker-compose -f on-premise/docker-compose.yml up -d```
+13. Start the lab manager and the reverse proxy ```docker compose -f on-premise/docker-compose.yml up -d```
 14. Check that the certificate is correctly used by the reverse proxy, the request ```https://lab-manager.${VIRTUAL_HOST}/health-check``` should return true. This can be tester directly on the server or from the another server (or a browser) that can access the on premise lab.
 
 Now the lab manager is ready and can be configured. If constellab server can access the lab thourgh HTTP, you can configurue the lab directly from the constellab. Otherwise see next section 'Configure the lab manager manually'.
