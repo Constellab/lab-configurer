@@ -11,9 +11,12 @@ sudo systemctl stop docker
 sudo systemctl stop docker.socket
 echo "[INFO] Docker containers stopped"
 
-# Change ownership of /app to $USER:$USER, excluding /app/dev/etc-ssh and mariadb directories
-echo "[INFO] Changing ownership of /app to $USER:$USER..."
-sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown -h $USER:$USER {} +
+# Get the user's primary group
+USER_GROUP=$(id -gn $USER)
+
+# Change ownership of /app to $USER:$USER_GROUP, excluding /app/dev/etc-ssh and mariadb directories
+echo "[INFO] Changing ownership of /app to $USER:$USER_GROUP..."
+sudo find /app -path /app/dev/etc-ssh -prune -o -path /app/gws_db/gws_core/prod/mariadb -prune -o -path /app/gws_db/gws_core/dev/mariadb -prune -o -path /app/gws_db/gws_biota/mariadb -prune -o -path /app/docker -prune -o -exec chown -h $USER:$USER_GROUP {} +
 echo "[INFO] Ownership change completed"
 
 # Change ownership of /app/dev/etc-ssh to root:root
