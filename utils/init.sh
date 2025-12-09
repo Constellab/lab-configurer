@@ -75,6 +75,7 @@ validate_parameters() {
 create_required_directories() {
   local directories=(
     "/app"
+    "/app/dev"
     "/app/dev/etc-ssh"
     "/app/docker"
   )
@@ -149,10 +150,19 @@ create_required_directories
 # Set folders permissions
 if [ "$(stat -c '%U' /app)" != "$USER" ]; then
     echo "[INFO] Changing ownership of /app to $USER:$USER..."
-    sudo chown "$USER:$USER" /app
+    sudo chown "$USER:$(id -gn $USER)" /app
     echo "[INFO] Ownership change completed"
 else
     echo "[INFO] /app is already owned by $USER"
+fi
+
+# Change ownership of /app/dev to $USER
+if [ "$(stat -c '%U' /app/dev)" != "$USER" ]; then
+    echo "[INFO] Changing ownership of /app/dev to $USER:$(id -gn $USER)..."
+    sudo chown "$USER:$(id -gn $USER)" /app/dev
+    echo "[INFO] Ownership change completed"
+else
+    echo "[INFO] /app/dev is already owned by $USER"
 fi
 
 # Change ownership of /app/dev/etc-ssh and /app/docker to root:root
