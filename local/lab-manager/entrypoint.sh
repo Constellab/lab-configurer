@@ -14,5 +14,5 @@ sudo chmod 666 /var/run/docker.sock
 
 echo "Dev environment for lab-manager ready!"
 
-# prevent the image to stop
-tail -f /dev/null
+# exec command
+exec "$@"

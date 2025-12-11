@@ -9,7 +9,7 @@
         "bricks": [
             {
                 "name": "gws_core",
-                "version": "0.16.0"
+                "version": "0.18.4"
             }
         ],
         "git": [],
