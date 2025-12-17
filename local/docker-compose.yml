@@ -88,12 +88,6 @@ services:
       - GWS_TEST_DB_PASSWORD=gencovery
       - GWS_TEST_DB_NAME=test_gws
       - GWS_TEST_DB_PORT=3306
-      # GWS_BIOTA database
-      - GWS_BIOTA_DB_HOST=lab-biota-db
-      - GWS_BIOTA_DB_USER=gws_biota
-      - GWS_BIOTA_DB_PASSWORD=gencovery
-      - GWS_BIOTA_DB_NAME=gws_biota
-      - GWS_BIOTA_DB_PORT=3306
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - REFLEX_ACCESS_TOKEN=${REFLEX_ACCESS_TOKEN}
     # Set your own path on the volume
@@ -125,7 +119,6 @@ services:
       - lab-manager-config:/app/conf
       - lab-manager-prod-db:/app/gws_db/gws_core/prod/mariadb
       - lab-manager-dev-db:/app/gws_db/gws_core/dev/mariadb
-      - lab-manager-biota:/app/gws_db/gws_biota/mariadb
       - lab-manager-prod-lab:/app/prod/lab
       - lab-manager-prod-data:/app/prod/data
       - lab-manager-dev-lab:/app/dev/lab
@@ -154,23 +147,6 @@ services:
     container_name: lab-db
     volumes:
       - lab-db:/var/lib/mysql
-    networks:
-      - gencovery-network-dev
-      - gencovery-network-prod
-
-  # Biota Development DB
-  lab-biota-db:
-    image: mariadb:10.7.4
-    environment:
-      - MYSQL_ROOT_PASSWORD=gencovery
-      - MYSQL_USER=gws_biota
-      - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=gws_biota
-    ports:
-      - 3309:3306
-    volumes:
-      - biota:/var/lib/mysql
-    container_name: lab-biota-db
     networks:
       - gencovery-network-dev
       - gencovery-network-prod
@@ -279,8 +255,6 @@ volumes:
     external: true
   lab-manager-dev-db:
     external: true
-  lab-manager-biota:
-    external: true
   lab-manager-prod-lab:
     external: true
   lab-manager-prod-data:
@@ -295,11 +269,6 @@ volumes:
     external: true
   lab-db:
     external: true
-  # glab-app:
-  # glab-data:
-  # glab-logs:
-  # glab-settings:
-  biota:
 
 networks:
   default:

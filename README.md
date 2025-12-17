@@ -67,7 +67,6 @@ docker volume create space-db
 docker volume create community-db
 docker volume create lab-db
 docker volume create lab-manager-app
-docker volume create lab-manager-biota
 docker volume create lab-manager-prod-db
 docker volume create lab-manager-dev-db
 docker volume create lab-manager-prod-lab
