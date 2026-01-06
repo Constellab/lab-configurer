@@ -78,7 +78,10 @@ docker volume create lab-manager-config
 
 To create the containers :
 
- 1. create a ```.env``` file in the local folder with ```OPENAI_API_KEY```
+ 1. create a ```.env``` file in the local folder with the following variables:
+    - ```SSH_KEY_PATH```: Path to your SSH private key (e.g., `C:\Users\YourName\.ssh\your-key`)
+    - ```OPENAI_API_KEY```: Your OpenAI API key (optional)
+    - ```REFLEX_ACCESS_TOKEN```: Your Reflex access token (optional)
  2. [Optional] modify the ```config-file.json``` file in the local folder with the brick you want to install. You can install the brick manually later directly in the lab.
  3. execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d```
 

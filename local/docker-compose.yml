@@ -99,7 +99,7 @@ services:
       # TODO TO FIX, this is created with root permission, so labuser cannot read /conf
       - ./config-file.json:/conf/config.json
       # Share git credentials by sharing ssh private key
-      - C:\Users\benji\.ssh\gencovery-github:/home/labuser/.ssh/id_rsa
+      - ${SSH_KEY_PATH}:/home/labuser/.ssh/id_rsa
     ports:
       - 3000:3000
       - 8080:8080
@@ -128,7 +128,7 @@ services:
       # share docker socket
       - /var/run/docker.sock:/var/run/docker.sock
       # Share git credentials by sharing ssh private key
-      - C:\Users\benji\.ssh\gencovery-github:/home/labuser/.ssh/id_rsa
+      - ${SSH_KEY_PATH}:/home/labuser/.ssh/id_rsa
     container_name: lab-manager-dev-env
     networks:
       - gencovery-network-dev
