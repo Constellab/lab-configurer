@@ -90,6 +90,7 @@ services:
       - GWS_TEST_DB_PORT=3306
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - REFLEX_ACCESS_TOKEN=${REFLEX_ACCESS_TOKEN}
+      - APP_EXTERNAL_PORT=${APP_EXTERNAL_PORT:-8510}
     # Set your own path on the volume
     volumes:
       # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
@@ -103,6 +104,7 @@ services:
     ports:
       - 3000:3000
       - 8080:8080
+      - ${APP_EXTERNAL_PORT:-8510}:8510 # For apps
     container_name: lab-dev-env
     networks:
       - gencovery-network-dev

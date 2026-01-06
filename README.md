@@ -56,9 +56,12 @@ This environment is useful to develop within the lab locally. At gencovery we ma
 
 To start this dev environment container folow the steps below.
 
-Create external volume for lab manager (required in the docker-compose file) :
+Create external networks and volumes for lab manager (required in the docker-compose file) :
 
 ``` bash
+docker network create gencovery-network-dev
+docker network create gencovery-network-prod
+
 docker volume create dev-env-app
 docker volume create dev-env-data
 docker volume create dev-env-logs
@@ -78,10 +81,7 @@ docker volume create lab-manager-config
 
 To create the containers :
 
- 1. create a ```.env``` file in the local folder with the following variables:
-    - ```SSH_KEY_PATH```: Path to your SSH private key (e.g., `C:\Users\YourName\.ssh\your-key`)
-    - ```OPENAI_API_KEY```: Your OpenAI API key (optional)
-    - ```REFLEX_ACCESS_TOKEN```: Your Reflex access token (optional)
+ 1. Copy ```.env.template``` to ```.env``` in the local folder and fill in the required values (see comments in the template file for details)
  2. [Optional] modify the ```config-file.json``` file in the local folder with the brick you want to install. You can install the brick manually later directly in the lab.
  3. execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d```
 
