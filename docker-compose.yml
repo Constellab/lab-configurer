@@ -58,6 +58,15 @@ services:
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
 
+      # Timeout settings (set to 0 to disable timeouts for large file uploads)
+      # Entrypoint timeouts (client → Traefik): handle long upload durations
+      - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=0"
+      - "--entrypoints.websecure.transport.respondingTimeouts.writeTimeout=0"
+      - "--entrypoints.websecure.transport.respondingTimeouts.idleTimeout=0"
+      # ServersTransport timeouts (Traefik → backend): handle long processing times
+      - "--serversTransport.forwardingTimeouts.responseHeaderTimeout=0"
+      - "--serversTransport.forwardingTimeouts.idleConnTimeout=0"
+
       #- "--log.level=DEBUG"
     environment:
       # Define the HTTP request endpoint for DNS challenges
