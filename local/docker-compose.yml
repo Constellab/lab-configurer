@@ -97,6 +97,8 @@ services:
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
       - dev-env-app:/lab
       - dev-env-data:/data
+      # Store VSCode server data to avoid re-downloading extensions each time
+      - dev-env-vscode:/home/labuser/.vscode-server
       # TODO TO FIX, this is created with root permission, so labuser cannot read /conf
       - ./config-file.json:/conf/config.json
       # Share git credentials by sharing ssh private key
@@ -246,6 +248,8 @@ volumes:
   dev-env-app:
     external: true
   dev-env-data:
+    external: true
+  dev-env-vscode:
     external: true
   # Thoses volumes are used by lab-manager when running locally
   # They are used to create volume between the lab manager container and the containers created by the lab manager
