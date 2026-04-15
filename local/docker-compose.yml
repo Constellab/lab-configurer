@@ -6,10 +6,10 @@ services:
   space_db:
     image: mariadb:10
     environment:
-      - MYSQL_ROOT_PASSWORD=gencoveryDb
+      - MYSQL_ROOT_PASSWORD=gencovery
       - MYSQL_USER=gencoveryUser
       - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=gencoveryDb
+      - MYSQL_DATABASE=spaceDb
     ports:
       - 3306:3306
     container_name: space-db
@@ -19,10 +19,10 @@ services:
   community_db:
     image: mariadb:10
     environment:
-      - MYSQL_ROOT_PASSWORD=gencoveryDb
+      - MYSQL_ROOT_PASSWORD=gencovery
       - MYSQL_USER=gencoveryUser
       - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=hubDb
+      - MYSQL_DATABASE=communityDb
     ports:
       - 3310:3306
     container_name: community-db
