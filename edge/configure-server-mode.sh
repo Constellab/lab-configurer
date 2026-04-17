@@ -22,9 +22,11 @@ sudo mkdir -p /etc/systemd/logind.conf.d
 
 if [ ! -f "$LOGIND_CONF" ] || [ "$(cat "$LOGIND_CONF")" != "$LOGIND_CONTENT" ]; then
     echo "$LOGIND_CONTENT" | sudo tee "$LOGIND_CONF" > /dev/null
-    sudo systemctl restart systemd-logind
+    # Only reload config, do not restart logind as it kills the current graphical session.
+    # Changes will fully apply after the reboot at the end of install_edge.sh.
+    sudo systemctl kill -s HUP systemd-logind
 else
-    echo "logind config already up to date, skipping restart."
+    echo "logind config already up to date, skipping reload."
 fi
 
 # Disable screen blanking via GNOME settings (if GNOME is available)
