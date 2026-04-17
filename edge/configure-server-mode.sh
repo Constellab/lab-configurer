@@ -44,6 +44,17 @@ echo "Installing and enabling SSH server..."
 sudo apt-get -y install openssh-server
 sudo systemctl enable ssh
 sudo systemctl start ssh
+sudo ufw allow ssh
+
+# Disable reverse DNS lookup to avoid lag on local network
+if grep -q "^UseDNS" /etc/ssh/sshd_config; then
+    sudo sed -i 's/^UseDNS.*/UseDNS no/' /etc/ssh/sshd_config
+elif grep -q "^#UseDNS" /etc/ssh/sshd_config; then
+    sudo sed -i 's/^#UseDNS.*/UseDNS no/' /etc/ssh/sshd_config
+else
+    echo "UseDNS no" | sudo tee -a /etc/ssh/sshd_config > /dev/null
+fi
+sudo systemctl restart ssh
 
 echo "SSH server is active. You can connect with: ssh $(whoami)@$(hostname).local"
 
