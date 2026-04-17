@@ -61,6 +61,43 @@ parse_arguments() {
   done
 }
 
+# Function to prompt for parameters interactively
+prompt_parameters() {
+  echo "No arguments provided, switching to interactive mode..."
+  echo ""
+
+  echo "Domain of the data lab (e.g. mydatalab.constellab.app or custom.domain.com)"
+  read -rp "Virtual host: " VIRTUAL_HOST
+
+  echo "Environment profile (e.g. prod, private-cloud)"
+  read -rp "Environment profile: " ENVIRONMENT_PROFILE
+
+  echo "Can be found in the lab detail admin edit mode (only for gencovery admin for now)"
+  read -rp "Lab manager API key: " LAB_MANAGER_API_KEY
+
+  echo "Use the lab recommended version"
+  read -rp "Lab manager version: " LAB_MANAGER_VERSION
+
+  echo ""
+  echo "--- Optional DNS challenge parameters (press Enter to skip) ---"
+  echo ""
+
+  echo "Set to true if you want an automatic public DNS challenge. Leave empty or set to false to disable it."
+  read -rp "DNS challenge enabled (true/false): " DNS_CHALLENGE_ENABLED
+
+  if [[ -n "$DNS_CHALLENGE_ENABLED" && "$DNS_CHALLENGE_ENABLED" != "false" ]]; then
+    echo "Provider of the DNS challenge."
+    echo "For a *.constellab.app domain, use 'httpreq'."
+    echo "Documentation: https://doc.traefik.io/traefik/reference/install-configuration/tls/certificate-resolvers/acme/#dnschallenge"
+    echo "Supported DNS providers: https://go-acme.github.io/lego/dns/"
+    read -rp "DNS challenge provider: " DNS_CHALLENGE_PROVIDER
+
+    echo "Route to call for the DNS challenge."
+    echo "For a *.constellab.app domain, use: https://api.constellab.space/external-labs-manager/lab/dns?authorization=[LAB_MANAGER_API_KEY]"
+    read -rp "DNS challenge route: " DNS_CHALLENGE_ROUTE
+  fi
+}
+
 # Function to validate required parameters
 validate_parameters() {
   if [[ -z "$VIRTUAL_HOST" ]] || [[ -z "$ENVIRONMENT_PROFILE" ]] || [[ -z "$LAB_MANAGER_API_KEY" ]] || [[ -z "$LAB_MANAGER_VERSION" ]]; then
@@ -100,8 +137,13 @@ DNS_CHALLENGE_ENABLED=""
 DNS_CHALLENGE_PROVIDER=""
 DNS_CHALLENGE_ROUTE=""
 
-# Parse arguments
-parse_arguments "$@"
+# If arguments are provided, parse them (pipeline mode)
+# Otherwise, prompt interactively
+if [[ "$#" -gt 0 ]]; then
+  parse_arguments "$@"
+else
+  prompt_parameters
+fi
 
 # Validate required parameters
 validate_parameters
