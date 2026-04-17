@@ -10,6 +10,14 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 echo "Preparing server environment..."
 bash "${ROOT_DIR}/utils/prepare_server.sh"
 
+# Configure mDNS (hostname + network discovery)
+echo "Setting up mDNS..."
+sudo bash "${SCRIPT_DIR}/setup-mdns.sh"
+
+# Configure server mode (no sleep + SSH)
+echo "Configuring server mode..."
+bash "${SCRIPT_DIR}/configure-server-mode.sh"
+
 # Create web shortcuts
 echo "Creating web shortcuts..."
 
