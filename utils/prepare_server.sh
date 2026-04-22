@@ -18,9 +18,6 @@ echo \
 
 sudo apt-get -y update
 
-# Ensure docker group has GID 999 before Docker installation
-sudo bash "${SCRIPT_DIR}/ensure_docker_gid.sh"
-
 # Install latest Docker version
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 sudo apt-get -y install docker-compose
