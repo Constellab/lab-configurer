@@ -84,7 +84,7 @@ services:
       - GWS_CORE_DB_PORT=3306
       # Test database
       - GWS_TEST_DB_HOST=lab-test-db
-      - GWS_TEST_DB_USER=test_gws
+      - GWS_TEST_DB_USER=root
       - GWS_TEST_DB_PASSWORD=gencovery
       - GWS_TEST_DB_NAME=test_gws
       - GWS_TEST_DB_PORT=3306
@@ -158,18 +158,31 @@ services:
   # GWS Test db
   lab-test-db:
     image: mariadb:10.7.4
+    # Only root credentials are needed — test databases and users are
+    # created on the fly by the test suite.
     environment:
       - MYSQL_ROOT_PASSWORD=gencovery
-      - MYSQL_USER=test_gws
-      - MYSQL_PASSWORD=gencovery
-      - MYSQL_DATABASE=test_gws
     ports:
       - 3308:3306
     container_name: lab-test-db
+    # Use tmpfs (RAM-backed filesystem) instead of a volume so the test DB
+    # is ephemeral — data is discarded when the container stops, and I/O is
+    # much faster since nothing hits disk.
+    tmpfs:
+      - /var/lib/mysql:rw,size=2g
+    # MariaDB tuning flags to maximize write speed at the cost of durability,
+    # which is fine for a test database that is thrown away after each run.
+    command:
+      - --innodb-flush-log-at-trx-commit=0 # don't flush redo log on every commit
+      - --innodb-doublewrite=0 # skip the doublewrite buffer
+      - --sync-binlog=0 # don't fsync the binlog on each write
+      - --skip-log-bin # disable binary logging entirely
+      - --innodb-flush-method=nosync # skip fsync/fdatasync calls
+      - --innodb-buffer-pool-size=512M # generous buffer pool for in-memory work
+      - --max-connections=200 # allow enough connections for parallel tests
     networks:
       - gencovery-network-dev
       - gencovery-network-prod
-
   # Run the codelab in local with same volume as dev-env
   # The local-codelab image must be built before from GPM package
   # local-codelab:
