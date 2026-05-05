@@ -12,6 +12,44 @@
 # env var) describing which bricks to install.
 
 services:
+  glab-test:
+    image: glab:latest
+    # depends_on:
+    #   test_gws_dev_db:
+    #     condition: service_healthy
+    environment:
+      - LAB_NAME=Test
+      - LAB_ID=1
+      - LAB_MODE=dev
+      - LAB_ENVIRONMENT=LOCAL
+      - LAB_FOLDER=/lab
+      - DATA_FOLDER=/data
+      - LAB_PROD_API_URL=http://localhost:3000
+      - LAB_DEV_API_URL=http://localhost:3000
+      - RUN_MODE=test
+      - VIRTUAL_HOST=
+      - TEST_BRICK_NAME=gws_core,gws_qa
+      - TEST_PARALLEL=true
+      # COMMUNITY
+      - COMMUNITY_API_URL=https://community-api-pre-prod.constellab-pre-prod.gencovery.com
+      - COMMUNITY_FRONT_URL=https://community-pre-prod.gencovery.com
+      # Tests connect to the MariaDB sidecar via the compose network.
+      - GWS_TEST_DB_HOST=test_gws_dev_db
+      - GWS_TEST_DB_PORT=3306
+      - GWS_TEST_DB_USER=root
+      - GWS_TEST_DB_PASSWORD=gencovery
+      - GWS_TEST_DB_NAME=gws_test
+      # Other
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - REFLEX_ACCESS_TOKEN=${REFLEX_ACCESS_TOKEN}
+      - APP_EXTERNAL_PORT=${APP_EXTERNAL_PORT:-8510}
+    volumes:
+      # GPM reads the brick list from /conf/config.json inside the container.
+      - C:\Users\benji\Documents\Projects\Gencovery\lab-configurer\local\config-file.json:/conf/config.json:ro
+      # - glab-test-app:/lab
+    networks:
+      - gencovery-network-dev
+
   test_gws_dev_db:
     image: mariadb:10.7.4
     environment:
@@ -36,44 +74,6 @@ services:
     #   interval: 5s
     #   timeout: 5s
     #   retries: 20
-    networks:
-      - gencovery-network-dev
-
-  glab-test:
-    image: glab:latest
-    # depends_on:
-    #   test_gws_dev_db:
-    #     condition: service_healthy
-    environment:
-      - LAB_NAME=Test
-      - LAB_ID=1
-      - LAB_MODE=dev
-      - LAB_ENVIRONMENT=LOCAL
-      - LAB_PROD_API_URL=http://localhost:3000
-      - LAB_DEV_API_URL=http://localhost:3000
-      - RUN_MODE=test
-      - LAB_FOLDER=/lab
-      - DATA_FOLDER=/data
-      - VIRTUAL_HOST=
-      - TEST_BRICK_NAME=gws_core
-      - TEST_PARALLEL=true
-      # COMMUNITY
-      - COMMUNITY_API_URL=https://community-api-pre-prod.constellab-pre-prod.gencovery.com
-      - COMMUNITY_FRONT_URL=https://community-pre-prod.gencovery.com
-      # Tests connect to the MariaDB sidecar via the compose network.
-      - GWS_TEST_DB_HOST=test_gws_dev_db
-      - GWS_TEST_DB_PORT=3306
-      - GWS_TEST_DB_USER=root
-      - GWS_TEST_DB_PASSWORD=gencovery
-      - GWS_TEST_DB_NAME=gws_test
-      # Other
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - REFLEX_ACCESS_TOKEN=${REFLEX_ACCESS_TOKEN}
-      - APP_EXTERNAL_PORT=${APP_EXTERNAL_PORT:-8510}
-    volumes:
-      # GPM reads the brick list from /conf/config.json inside the container.
-      - C:\Users\benji\Documents\Projects\Gencovery\lab-configurer\local\config-file.json:/conf/config.json:ro
-      # - glab-test-app:/lab
     networks:
       - gencovery-network-dev
 

@@ -61,6 +61,8 @@ services:
       - LAB_DB_ENGINE=mariadb
       - LAB_MODE=dev
       - LAB_ENVIRONMENT=LOCAL
+      - LAB_FOLDER=/lab
+      - DATA_FOLDER=/data
       - LAB_PROD_API_URL=http://localhost:3000
       - LAB_DEV_API_URL=http://localhost:3000
       - LAB_MANAGER_API_URL=http://lab-manager-dev-env:3080
