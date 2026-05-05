@@ -29,6 +29,9 @@ if [ ! -f /etc/docker/daemon.json ]; then
     sudo cp "${SCRIPT_DIR}/docker/daemon.json" /etc/docker/daemon.json
 fi
 
+# Setup unattended security upgrades
+bash "${SCRIPT_DIR}/setup_unattended_upgrades.sh"
+
 # Detect GPU and install
 if [[ "`lspci | grep -i nvidia`" != "" ]]; then
     bash "${SCRIPT_DIR}/gpu/install_nvidia.sh"
