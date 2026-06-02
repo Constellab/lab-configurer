@@ -97,6 +97,7 @@ services:
     volumes:
       # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
       # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
+      # TODO TO FIX, this is created /data and /lab with root permission, so labuser cannot access them
       - dev-env-app:/lab
       - dev-env-data:/data
       # Store VSCode server data to avoid re-downloading extensions each time
