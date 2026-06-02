@@ -64,12 +64,12 @@ docker network create gencovery-network-prod
 
 docker volume create dev-env-app
 docker volume create dev-env-data
-docker volume create dev-env-logs
+docker volume create dev-env-vscode
+docker volume create dev-env-claude
 docker volume create lab-manager-home
 docker volume create space-db
 docker volume create community-db
 docker volume create lab-db
-docker volume create lab-manager-app
 docker volume create lab-manager-prod-db
 docker volume create lab-manager-dev-db
 docker volume create lab-manager-prod-lab
