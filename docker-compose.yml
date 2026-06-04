@@ -46,11 +46,11 @@ services:
       # as the limit for a domain is 50 per week
       - "--certificatesresolvers.myresolver.acme.dnschallenge=${DNS_CHALLENGE_ENABLED:-false}"
       - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=${DNS_CHALLENGE_PROVIDER:-httpreq}"
-      # Let Traefik poll DNS until the TXT record is visible (up to 120s)
-      # instead of immediately requesting validation from Let's Encrypt
-      - "--certificatesresolvers.myresolver.acme.dnschallenge.delayBeforeCheck=0"
+      # Enable DNS propagation checks so Traefik polls until the TXT record
+      # is visible before requesting validation from Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.propagation=true"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.propagation.delaybeforechecks=0"
       - "--certificatesresolvers.myresolver.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
-      - "--certificatesresolvers.myresolver.acme.dnschallenge.propagationTimeout=120"
       # Email for let's encrypt
       - "--certificatesresolvers.myresolver.acme.email=admin@gencovery.com"
       # Json file to store certificate
