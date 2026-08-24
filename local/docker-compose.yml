@@ -29,6 +29,28 @@ services:
     volumes:
       - community-db:/var/lib/mysql
 
+  space_test_db:
+    image: mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gencoveryUser
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=testDb
+    ports:
+      - 3311:3306
+    container_name: space-test-db
+
+  community_test_db:
+    image: mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=gencovery
+      - MYSQL_USER=gencoveryUser
+      - MYSQL_PASSWORD=gencovery
+      - MYSQL_DATABASE=testDb
+    ports:
+      - 3312:3306
+    container_name: community-test-db
+
   redisqueue:
     image: redis
     ports:
@@ -74,6 +96,7 @@ services:
       - BIOTA_BIODATA_DIR=/data/gws_biota/biodata/
       - CONDA_VERSION=latest
       - GPU=
+      - GWS_MCP_SERVER_ENABLED=true
       # COMMUNITY
       - COMMUNITY_API_URL=https://api.constellab.community
       - COMMUNITY_FRONT_URL=https://constellab.community
@@ -289,6 +312,8 @@ volumes:
   lab-manager-dev-data:
     external: true
   space-db:
+    external: true
+  test-db:
     external: true
   community-db:
     external: true
