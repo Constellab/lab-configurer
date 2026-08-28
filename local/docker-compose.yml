@@ -97,6 +97,7 @@ services:
       - CONDA_VERSION=latest
       - GPU=
       - GWS_MCP_SERVER_ENABLED=true
+      - ENABLE_SSH_SERVER=true
       # COMMUNITY
       - COMMUNITY_API_URL=https://api.constellab.community
       - COMMUNITY_FRONT_URL=https://constellab.community
@@ -118,9 +119,10 @@ services:
       - APP_EXTERNAL_PORT=${APP_EXTERNAL_PORT:-8510}
     # Set your own path on the volume
     volumes:
-      # use the named volume lab to improve performance : https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
-      # volume is available at \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\local_lab\_data
-      # TODO TO FIX, this is created /data and /lab with root permission, so labuser cannot access them
+      # Named volumes bound to ${DOCKER_VOLUMES_ROOT}/dev-env on the host (see the
+      # volumes section at the bottom of this file). On Windows/WSL a plain named
+      # volume was used for performance :
+      # https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
       - dev-env-app:/lab
       - dev-env-data:/data
       # Store VSCode server data to avoid re-downloading extensions each time
@@ -147,6 +149,7 @@ services:
       - VIRTUAL_HOST=localhost
     volumes:
       # map the named volume to the same path as prod environment
+      # data is stored in ${DOCKER_VOLUMES_ROOT}/lab-manager on the host
       - lab-manager-config:/app/conf
       - lab-manager-prod-db:/app/gws_db/gws_core/prod/mariadb
       - lab-manager-dev-db:/app/gws_db/gws_core/dev/mariadb
@@ -284,41 +287,132 @@ services:
   #      - 3000:3000
   #      - 8080:8080
 
+# All the volumes below are named volumes backed by a bind mount to a known
+# folder on the host (DOCKER_VOLUMES_ROOT, defined in .env).
+#
+# Why not plain bind mounts (- ${DOCKER_VOLUMES_ROOT}/x:/lab) ?
+#   - the volume keeps its name, so the lab manager (which creates sibling
+#     containers through the docker socket) can still mount them by name
+#   - docker still copies the image content into the folder on first start
+#     (a plain bind mount would hide /lab, /home/labuser/... content)
+# Why not pure named volumes (as before, for Windows) ?
+#   - on Linux there is no bind mount performance penalty, and data ends up
+#     in a folder you can browse/backup instead of /var/lib/docker/volumes
+#   - the folders are created by your user (uid 1000), which is the same uid
+#     as labuser in the containers, so no more root permission issue
+#
+# The folders MUST exist before `docker compose up`, run: bash init.sh
 volumes:
   dev-env-app:
-    external: true
+    name: dev-env-app
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/dev-env/app
   dev-env-data:
-    external: true
+    name: dev-env-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/dev-env/data
   dev-env-vscode:
-    external: true
+    name: dev-env-vscode
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/dev-env/vscode
   dev-env-claude:
-    external: true
+    name: dev-env-claude
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/dev-env/claude
+
   # Thoses volumes are used by lab-manager when running locally
   # They are used to create volume between the lab manager container and the containers created by the lab manager
   lab-manager-home:
-    external: true
+    name: lab-manager-home
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/home
   lab-manager-config:
-    external: true
+    name: lab-manager-config
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/config
   lab-manager-prod-db:
-    external: true
+    name: lab-manager-prod-db
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/prod-db
   lab-manager-dev-db:
-    external: true
+    name: lab-manager-dev-db
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/dev-db
   lab-manager-prod-lab:
-    external: true
+    name: lab-manager-prod-lab
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/prod-lab
   lab-manager-prod-data:
-    external: true
+    name: lab-manager-prod-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/prod-data
   lab-manager-dev-lab:
-    external: true
+    name: lab-manager-dev-lab
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/dev-lab
   lab-manager-dev-data:
-    external: true
+    name: lab-manager-dev-data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/lab-manager/dev-data
+
+  # Databases
   space-db:
-    external: true
-  test-db:
-    external: true
+    name: space-db
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/db/space
   community-db:
-    external: true
+    name: community-db
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/db/community
   lab-db:
-    external: true
+    name: lab-db
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${DOCKER_VOLUMES_ROOT}/db/lab
 
 networks:
   default:

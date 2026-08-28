@@ -56,32 +56,28 @@ This environment is useful to develop within the lab locally. At gencovery we ma
 
 To start this dev environment container folow the steps below.
 
-Create external networks and volumes for lab manager (required in the docker-compose file) :
+The ``local/init.sh`` script creates everything the docker-compose file expects to
+already exist : the external docker networks, and the host folders backing the docker
+volumes.
+
+The docker volumes are created by docker compose itself. They are named volumes bound
+to a folder on the host (``DOCKER_VOLUMES_ROOT`` in the ``.env`` file), so all the data
+(databases, ``/lab``, ``/data``, lab manager data) is stored in one known folder that you
+can browse, backup or delete. Docker does not create those folders, hence the script.
 
 ``` bash
-docker network create gencovery-network-dev
-docker network create gencovery-network-prod
-
-docker volume create dev-env-app
-docker volume create dev-env-data
-docker volume create dev-env-vscode
-docker volume create dev-env-claude
-docker volume create lab-manager-home
-docker volume create space-db
-docker volume create community-db
-docker volume create lab-db
-docker volume create lab-manager-prod-db
-docker volume create lab-manager-dev-db
-docker volume create lab-manager-prod-lab
-docker volume create lab-manager-prod-data
-docker volume create lab-manager-dev-lab
-docker volume create lab-manager-dev-data
-docker volume create lab-manager-config
+cd local
+bash init.sh
 ```
+
+Run it with your own user (uid 1000), not with sudo : ``labuser`` in the containers uses
+uid 1000 as well, so the folders are readable and writable from inside the containers.
+The script is idempotent, it can be run again safely.
 
 To create the containers :
 
  1. Copy ```.env.template``` to ```.env``` in the local folder and fill in the required values (see comments in the template file for details)
+ 1. Create the networks and the volume folders : ```bash init.sh```
  2. [Optional] modify the ```config-file.json``` file in the local folder with the brick you want to install. You can install the brick manually later directly in the lab.
  3. execute the docker-compose file under local folder : ```docker compose --env-file ./.env up -d```
 
